@@ -1,0 +1,64 @@
+// template-method.bsh
+
+// Defines the skeleton of an algorithm in an operation, deferring some steps
+// to subclases. Let subclasses redefine certain steps of an algorithm without 
+// changing the algorithm's structure.
+
+// 1. template
+
+public abstract class AlgorithmTemplate {  
+   
+  // The "template method" - calls the concrete class methods, is not overridden
+  public final void someTemplateMethod() {
+    step1();
+    step2();
+    step3();
+  }  
+
+  // These methods are "primitive operations" and must be overridden in the concrete templates
+
+  protected abstract void step1();
+
+  protected abstract void step2();
+
+  protected abstract void step3();
+}
+
+// 2. template implementations
+
+public class MyAlgorithmTemplate1 extends AlgorithmTemplate {
+  protected void step1() {
+    System.out.println("algorithm1: step1");
+  }
+
+  protected void step2() {
+    System.out.println("algorithm1: step2");
+  }
+
+  protected void step3() {
+    System.out.println("algorithm1: step3");
+  }
+}
+
+public class MyAlgorithmTemplate2 extends AlgorithmTemplate {
+  protected void step1() {
+    System.out.println("algorithm2: step1");
+  }
+
+  protected void step2() {
+    System.out.println("algorithm2: step2");
+  }
+
+  protected void step3() {
+    System.out.println("algorithm2: step3");
+  }
+}
+
+// test
+
+AlgorithmTemplate template1 = new MyAlgorithmTemplate1();
+AlgorithmTemplate template2 = new MyAlgorithmTemplate2();
+
+template1.someTemplateMethod();
+template2.someTemplateMethod();
+

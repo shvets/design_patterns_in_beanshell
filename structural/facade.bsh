@@ -1,0 +1,44 @@
+// facade.bsh
+
+// Provides an unified interface to a set of interfaces in a subsystem.
+// Defines a high-level interface that makes the sybsystem easier to use.
+
+// 1. different parts of the system
+
+class Component1 {
+  public void operation1() {
+    System.out.println("operation1");
+  }
+}
+
+class Component2 {
+  public void operation2() {
+    System.out.println("operation2");
+  }
+}
+
+class Component3 {
+  public void operation3() {
+    System.out.println("operation3");
+  }
+}
+
+// 2. facade to different parts; end user will communicate with them through the facade only.
+
+class MyFacade {
+  public void doSomething() {
+    Component1 component1 = new Component1();
+    Component2 component2 = new Component2();
+    Component3 component3 = new Component3();
+
+    component1.operation1();
+    component3.operation3();
+    component2.operation2();
+  }
+}
+
+// 3. test
+
+MyFacade facade = new MyFacade();
+
+facade.doSomething();

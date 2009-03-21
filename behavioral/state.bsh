@@ -1,0 +1,55 @@
+// states.bsh
+
+// Allow an object to alter it's behavior when it's internal state changes.
+// The object will appear to change it's class.
+
+// 1. state type and it's implementations
+
+interface State {
+  void handle();
+}
+
+class MyState1 implements State {
+  public void handle() {
+    System.out.println("handle1");
+  }
+}
+
+class MyState2 implements State {
+  public void handle() {
+    System.out.println("handle2");
+  }
+}
+
+// 2. context's type and it's implementation
+
+interface Context {
+  void setState(State state);
+
+  void request();
+}
+
+class MyContext implements Context {
+  private State state;
+
+  public void setState(State state) {
+    this.state = state;
+  }
+
+  public void request() {
+    state.handle();
+  }
+}
+
+// 3. test
+
+Context context = new MyContext();
+
+State state1 = new MyState1();
+State state2 = new MyState2();
+
+context.setState(state1);
+context.request();
+
+context.setState(state2);
+context.request();

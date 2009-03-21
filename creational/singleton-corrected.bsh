@@ -1,0 +1,66 @@
+// singleton-corrected.bsh
+
+// Trying to replcae Singleton pattern with interface inheritance and dependency injection.
+// Now we can mock the singleton. 
+
+// - Reduce hidden coupling;
+// - Allow testability;
+// - Allow subclassing;
+// - Make construction and use flexible;
+
+// 1. Rediefine singleton. 
+
+interface Singleton {
+  void operation();
+}
+
+final class MySingleton implements Singleton {
+
+  public void operation() {
+    System.put.println("operation");
+  }
+
+}
+
+// 2. Class that uses the singleton object (we should be able to set it up from outside).
+
+class SingletonUser {
+  private Singleton singleton;
+
+  public SingletonUser(Singleton singleton) {
+    this.singleton = singleton;
+  }
+
+  public void doSomething() {
+    singleton.operation();
+  }
+
+}
+
+// 3. Mock object for the singleton and the test
+
+class MockSingleton implements Singleton {
+
+  public void operation() {
+    System.out.println("mock operation");
+  }
+
+}
+
+public class SingletonTest {
+  public void testSingleton() {
+    Singleton singleton = new MockSingleton();
+
+    SingletonUser singletonUser = new SingletonUser(singleton);
+    
+    singletonUser.doSomething();
+    
+    // assertions
+  }
+}
+
+// 4. test
+
+SingletonTest tester = new SingletonTest();
+
+tester.testSingleton();

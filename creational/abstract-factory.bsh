@@ -1,0 +1,77 @@
+// abstract-factory.bsh
+
+// Provides an interface for creationg families of related or dependent objects without specifying
+// their concrete class.
+//
+// Provides one level of interface higher than the factory pattern. It is used to return one
+// of several factories.
+
+// 1. common interface for type and it's specializations
+
+interface Alive {
+  void live();
+}
+
+interface Plant implements Alive {}
+
+interface Animal implements Alive {}
+
+// 2. implementations of specializations
+
+class Roze implements Plant {
+  public void live() {
+    System.out.println("roze"); 
+  }
+}
+
+class Elephant implements Animal {
+  public void live() {
+    System.out.println("elephant"); 
+  }
+}
+
+// 3. interface for factory (abstract factory)
+
+interface AliveFactory {
+  Alive createAlive();
+}
+
+// 4. different factories implementations
+
+class PlantFactory implements AliveFactory {
+  public Alive createAlive() {
+    return new Roze();
+  }
+}
+
+class AnimalFactory implements AliveFactory {
+  public Alive createAlive() {
+    return new Elephant();
+  }
+}
+
+// 5. factories manager (optional)
+
+class AliveManager {
+  public AliveFactory createAliveFactory(int type) {
+    if(type == 1) {
+      return new PlantFactory();
+    }
+    else if(type == 2) {
+      return new AnimalFactory();
+    }
+  } 
+}
+
+// 6. test
+
+AliveManager aliveManager = new AliveManager();
+
+AliveFactory aliveFactory1 = aliveManager.createAliveFactory(1);
+AliveFactory aliveFactory2 = aliveManager.createAliveFactory(2);
+
+Alive alive1 = aliveFactory1.createAlive();
+Alive alive2 = aliveFactory2.createAlive();
+
+alive1.live();
+alive2.live();

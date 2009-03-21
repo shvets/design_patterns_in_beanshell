@@ -1,0 +1,61 @@
+// builder.bsh
+
+// Separates the construction of a complex object from its representation so that the same
+// construction process can create different representations.
+
+// 1. type builder interface
+
+interface ProductBuilder {
+  void buildPart1();
+  void buildPart2();
+  void buildPart3();
+}
+
+// 2. type builder implementations
+
+class ComputerBuilder implements ProductBuilder {
+  public void buildPart1() {
+    System.out.println("Building part1: motherboard");
+  }
+
+  public void buildPart2() {
+    System.out.println("Building part2: CPU");
+  }
+
+  public void buildPart3() {
+    System.out.println("Building part3: display");
+  }
+}
+
+class TableBuilder implements ProductBuilder {
+  public void buildPart1() {
+    System.out.println("Building part1: legs");
+  }
+
+  public void buildPart2() {
+    System.out.println("Building part2: top");
+  }
+
+  public void buildPart3() {
+    System.out.println("Building part3: mounting");
+  }
+}
+
+// 3. director
+
+class Director {
+  public void construct(ProductBuilder builder) {
+    builder.buildPart1();
+    builder.buildPart2();
+    builder.buildPart3();
+  }
+}
+
+// 4. test
+
+Director director = new Director();
+
+director.construct(new ComputerBuilder());
+
+director.construct(new TableBuilder());
+

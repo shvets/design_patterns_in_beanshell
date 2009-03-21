@@ -1,0 +1,106 @@
+// visitor.bsh
+
+// Represents an operation to be performed on the elements of an object structure.
+// Lets you define a new operation without changing the classes of the elements on which
+// it operates.
+
+// 1. type and visitor interfaces
+
+interface Visitable {
+  void accept(Visitor visitor);
+}
+
+interface Visitor {
+  void visit(Visitable visitable);
+}
+
+// 2. type implementation woth visitable behavior
+
+// basic parts
+
+class MyVisitable1 implements Visitable {
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+}
+
+class MyVisitable2 implements Visitable {
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+}
+
+class MyVisitable3 implements Visitable {
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+}
+
+// compound
+
+class MyCompoundVisitable implements Visitable {
+  private Visitable visitable1 = new MyVisitable1();
+  private Visitable visitable2 = new MyVisitable2();
+
+  private Visitable[] visitables3 = new MyVisitable3[] {
+    new MyVisitable3(), new MyVisitable3(), new MyVisitable3()
+  };
+
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+
+    // takes care of components
+    visitable1.accept(visitor);
+    visitable2.accept(visitor);
+
+    for(MyVisitable3 visitable: visitables3) {
+      visitable.accept(visitor);
+    }
+  }     
+}
+
+// 3. visitor implementations
+
+class MyVisitor1 implements Visitor {
+  public void visit(Visitable visitable) {
+    if(visitable instanceof MyVisitable1) {
+      System.out.println("visitor1: visiting my visitable 1");
+    }
+    else if(visitable instanceof MyVisitable2) {
+      System.out.println("visitor1: visiting my visitable 2");
+    }
+    else if(visitable instanceof MyVisitable3) {
+      System.out.println("visitor1: visiting my visitable 3");
+    }
+    else if(visitable instanceof MyCompoundVisitable) {
+      System.out.println("visitor1: visiting my compound visitable");
+    }
+  }
+}
+
+class MyVisitor2 implements Visitor {
+  public void visit(Visitable visitable) {
+    if(visitable instanceof MyVisitable1) {
+      System.out.println("visitor2: visiting my visitable 1");
+    }
+    else if(visitable instanceof MyVisitable2) {
+      System.out.println("visitor2: visiting my visitable 2");
+    }
+    else if(visitable instanceof MyVisitable3) {
+      System.out.println("visitor2: visiting my visitable 3");
+    }
+    else if(visitable instanceof MyCompoundVisitable) {
+      System.out.println("visitor2: visiting my compound visitable");
+    }
+  }
+}
+
+// 4. test
+
+Visitable visitable = new MyCompoundVisitable();
+
+Visitor visitor1 = new MyVisitor1();
+Visitor visitor2 = new MyVisitor2();
+
+visitable.accept(visitor1);
+visitable.accept(visitor2);

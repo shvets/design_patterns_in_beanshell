@@ -1,0 +1,63 @@
+// interpreter.bsh
+
+// Given a language, defines a representation for it's grammar along with an interpreter
+// that uses the representation to interpret sentences in the language
+
+// 1. context
+
+class NamesInterpreterContext {
+  private ArrayList names = new ArrayList(); 
+
+  public NamesInterpreterContext() {
+    names.add("monitor");
+    names.add("keyboard");
+    names.add("mouse");
+    names.add("system-block");
+  }
+
+  public ArrayList getAllNames() {
+    return names;
+  }
+}
+
+public class NamesInterpreter {  
+  private NamesInterpreterContext context; 
+  
+  public NamesInterpreter(NamesInterpreterContext context) {
+    this.context = context;
+  }
+   
+  // expression syntax:
+  // show names
+  public String interpret(String expression) {
+    StringBuffer result = new StringBuffer();
+
+    StringTokenizer expressionTokens = new StringTokenizer(expression);
+
+    if(expressionTokens.hasMoreTokens()) {
+      String currentToken = expressionTokens.nextToken();
+
+      if (currentToken.equals("show")) {
+        currentToken = expressionTokens.nextToken();
+
+        if (currentToken.equals("names")) {
+          result.append("" + context.getAllNames());
+        }
+        else {
+          result.append("error!");
+        }
+      }
+      else {
+        result.append("error!");
+      }
+    }  
+       
+    return result.toString();
+  }
+}
+
+// test
+
+NamesInterpreter interpreter = new NamesInterpreter(new NamesInterpreterContext());
+
+System.out.println("interpreting show names: " + interpreter.interpret("show names"));

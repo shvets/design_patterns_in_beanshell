@@ -1,0 +1,58 @@
+// flyweight.bsh
+
+// Uses sharing to support large numbers of fine grained objects efficiently.
+
+// 1. type interface
+
+interface Item {
+  void process();
+} 
+
+// 2. type implementations
+
+class MyItem1 implements Item {
+  public void process() {
+    System.out.println("my item1 process");
+  }
+}
+
+class MyItem2 implements Item {
+  public void process() {
+    System.out.println("my item2 process");
+  }
+}
+
+// 3. type factory; some kind of cache
+
+class ItemCache {
+  private Item item1 = new MyItem1();
+  private Item item2 = new MyItem2();
+
+  public Item getItem(int type) {
+    if(type == 1) {
+      return item1;
+    }
+    else if(type == 2) {
+      return item2;
+    }
+  }
+}
+
+//4. test
+
+ItemCache cache = new ItemCache();
+
+Item[] items = new Item[] {
+  cache.getItem(1), 
+  cache.getItem(2),
+  cache.getItem(2),
+  cache.getItem(2),
+  cache.getItem(1),
+  cache.getItem(2),
+  cache.getItem(1),
+  cache.getItem(2)
+};
+
+for(int i=0; i < items.length; i++) {
+  items[i].process();
+}

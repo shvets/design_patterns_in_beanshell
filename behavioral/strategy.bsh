@@ -1,0 +1,50 @@
+// strategy.bsh
+
+// Defines a family of algorithms, encapsulate each one, and
+// make them interchangeable. Let the algorithm vart independently from
+// clients that use it.
+
+// 1. strategy type and it's implementations
+
+interface Strategy {
+  void operation();
+}
+
+class MyStrategy1 implements Strategy {
+  public void operation() {
+    System.out.println("operation1");
+  }
+}
+
+class MyStrategy2 implements Strategy {
+  public void operation() {
+    System.out.println("operation2");
+  }
+}
+
+// 2. strategy context
+
+class StrategyContext {
+  private Strategy strategy;
+ 
+  public void setStrategy(Strategy strategy) {
+    this.strategy = strategy;
+  }
+ 
+  public void execute() {
+    strategy.operation();
+  }
+}
+
+// 3. test
+
+StrategyContext context = new StrategyContext();
+
+Strategy strategy1 = new MyStrategy1();
+Strategy strategy2 = new MyStrategy2();
+
+context.setStrategy(strategy1);
+context.execute();
+
+context.setStrategy(strategy2);
+context.execute();

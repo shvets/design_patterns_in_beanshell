@@ -1,0 +1,38 @@
+// proxy.bsh
+
+// Provides a surrogate or placeholder for another object to control access to it.
+
+// 1. type interface
+
+interface Subject {
+  void process();
+}
+
+// 2. type implementation
+
+class MySubject implements Subject {
+  public void process() {
+    System.out.println("my process");
+  }
+}
+
+// 3.type proxy implementation
+
+class SubjectProxy implements Subject {
+  private Subject subject;
+
+  public SubjectProxy(Subject subject) {
+    this.subject = subject;
+  }
+
+  public void process() {
+    subject.process();
+  }
+}
+
+
+// 4. test 
+
+SubjectProxy proxy = new SubjectProxy(new MySubject());
+
+proxy.process();

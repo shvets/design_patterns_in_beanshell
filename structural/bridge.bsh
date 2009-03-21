@@ -1,0 +1,55 @@
+// bridge.bsh
+
+// Decouples an abstraction from it's implementation so that the two can vary independently.
+
+// 1. implementor
+
+interface Material {
+  void make();
+}
+
+// 2. concrete implementors
+
+class MyMaterial1 implements Material {
+  public void make() {
+    System.out.println("make: my material 1");
+  }
+}
+
+class MyMaterial2 implements Material {
+  public void make() {
+    System.out.println("make: my material 2");
+  }
+}
+
+// 3. abstraction
+
+interface Product {
+  void taste();
+}
+
+// 4. refined abstraction
+
+class MyProduct implements Product {
+  private Material material;
+
+  public MyProduct(Material material) { // injecting implementor
+    this.material = material;
+  }
+
+  public void taste() {
+    material.make();
+  }
+
+}
+
+// 5. test (bridge)
+
+Material material1 = new MyMaterial1();
+
+MyProduct product1 = new MyProduct(new MyMaterial1());
+MyProduct product2 = new MyProduct(new MyMaterial2());
+
+product1.taste();
+product2.taste();
+

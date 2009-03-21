@@ -1,0 +1,85 @@
+// mediator.bsh
+
+// Define an object that encapsulates how a set of objects interact.
+// Promotes loose coupling by keeping objects from referring to each other 
+// explicitly and it lets you vary their interactions independently.
+
+// 1. mediator interface
+
+interface Mediator {
+  void operation1();
+  void operation2();
+}
+
+// 2. Mediator implementation
+
+class MyMediator implements Mediator {
+  public void operation1() {
+    System.out.println("mediator: operation 1");
+  }
+
+  public void operation2() {
+    System.out.println("mediator: operation 2");
+  }
+}
+
+// 3. Concrete classes that are aware of mediator
+
+class Product1 {
+  private Mediator mediator;
+
+  public Product1(Mediator mediator) {
+    this.mediator = mediator;
+  }
+
+  public void perform() {
+    mediator.operation1();
+  }
+}
+
+class Product2 {
+  private Mediator mediator;
+
+  public Product2(Mediator mediator) {
+    this.mediator = mediator;
+  }
+
+  public void perform() {
+    mediator.operation1();
+  }
+}
+
+class Product3 {
+  private Mediator mediator;
+
+  public Product3(Mediator mediator) {
+    this.mediator = mediator;
+  }
+
+  public void perform() {
+    mediator.operation2();
+  }
+}
+
+// 4. test
+
+MyMediator mediator = new MyMediator();
+
+Product1 product11 = new Product1(mediator);
+Product1 product12 = new Product1(mediator);
+
+Product2 product21 = new Product2(mediator);
+Product2 product22 = new Product2(mediator);
+
+Product3 product31 = new Product3(mediator);
+Product3 product32 = new Product3(mediator);
+
+product11.perform();
+product12.perform();
+
+product21.perform();
+product21.perform();
+
+product31.perform();
+product31.perform();
+

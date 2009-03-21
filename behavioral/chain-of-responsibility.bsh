@@ -1,0 +1,52 @@
+// chain-of-responsibility.bsh
+
+// Avoid coulpling the sender of a request to it's receiver by giving more than
+// one object a chance to handle the request. Chain the receiving object and pass
+// the request along the chain until an object handles it.
+
+// 1. type interface
+
+interface Handler {
+  void handle();
+
+  void setNextHandler(Handler handler);
+}
+
+// 2. type implementation
+
+class MyHandler implements Handler {
+  private Handler nextHandler;
+  
+  private String name;
+
+  public MyHandler(String name) {
+    this.name = name;
+  }
+  
+  public void handle() {
+    System.out.println("Handling by " + name + ".");
+
+    if(nextHandler != null) {
+      nextHandler.handle();
+    }
+  }
+
+  public void setNextHandler(Handler nextHandler) {
+    this.nextHandler = nextHandler;
+  }
+}
+
+// 3. test
+
+MyHandler handler1 = new MyHandler("handler1");
+MyHandler handler2 = new MyHandler("handler2");
+MyHandler handler3 = new MyHandler("handler3");
+MyHandler handler4 = new MyHandler("handler4");
+MyHandler handler5 = new MyHandler("handler5");
+
+handler1.setNextHandler(handler2);
+handler2.setNextHandler(handler5);
+handler5.setNextHandler(handler3);
+handler3.setNextHandler(handler4);
+
+handler1.handle();

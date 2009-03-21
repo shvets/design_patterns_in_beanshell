@@ -1,0 +1,30 @@
+// lazy-initialization.bsh
+
+// Lazy initialization is the tactic of delaying the creation of an object, 
+// the calculation of a value, or some other expensive process until 
+// the first time it is needed.
+
+public class Item {
+  private static Item instance;
+  
+  public static /*synchronized*/ Item getItem() {
+    if (instance == null) {
+      System.out.println("Creating new instance");
+
+      instance = new Item(); // lazy initialization
+    }
+    else {
+      System.out.println("Using existing instance");
+    }
+
+    return instance;
+  }
+}
+
+// test
+
+Item item1 = Item.getItem();
+
+Item item2 = Item.getItem();
+
+Item item3 = Item.getItem();

@@ -1,0 +1,63 @@
+// factory-method.bsh
+
+// Defines an interface for creating an object, but let subclasses decide which
+// class to instantiate. Lets a class to defer instantiation to sublcasses.
+
+// 1. common type interface
+
+interface Shape {
+  void draw();
+}
+
+// 2. implementations of common type interface
+
+class Line implements Shape {
+  public void draw() {
+    System.out.println("line"); 
+  }
+}
+
+class Square implements Shape {
+  public void draw() {
+    System.out.println("square");
+  }
+}                             
+
+// 3. Creator class for various types
+
+class ShapeCreator {
+
+  // factory methods
+
+  public Shape createLine() {
+    return new Line();
+  }
+
+  public Shape createSquare() {
+    return new Square();
+  }
+
+  // or universal factory method
+
+  public Shape createShape(int type) {
+    if(type == 1) {
+      return new Line();
+    }
+    else if(type== 2) {
+      return new Square();
+    }
+  }
+
+}
+
+// 4. test
+
+ShapeCreator shapeCreator = new ShapeCreator();
+
+Shape shape1 = shapeCreator.createLine();
+Shape shape2 = shapeCreator.createSquare();
+
+shape1.draw();
+shape2.draw();
+
+

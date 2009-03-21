@@ -1,0 +1,180 @@
+// data-access-object.bsh
+
+// 1.
+
+interface TransferObject {
+  Object getData(String key);
+
+  void setData(String key, Object value);
+}
+
+interface TransferObjectDAO {
+  void setDataSource(DataSource dataSource);
+
+  int create();
+  boolean update(TransferObject to);
+  boolean delete(TransferObject to);
+  TransferObject find(int id);
+
+  List getAll();
+}
+
+interface DataSource {
+  int generateNextId();
+
+  Object executeCommand(String command, Object param);
+}
+
+interface TransferObjectDAOFactory {
+  TransferObjectDAO getTransferObjectDAO();
+}
+
+// 2.
+
+class MyTransferObject implements TransferObject {
+  private Map data = new HashMap();
+  
+  public Object getData(String key) {
+    return data.get(key);
+  }
+
+  public void setData(String key, Object value) {
+    data.put(key, value);
+  }
+
+  public String toString() {
+    return data.toString();
+  }
+}
+
+class MyDataSource implements DataSource {
+  private int generatedId = 0;
+
+  private List objects = new ArrayList();
+  
+  public int generateNextId() {
+    return generatedId++;
+  }
+
+  public Object executeCommand(String command, Object param) {
+    Object result = null;
+
+    if(command.equals("insert")) {
+      result = new Boolean(objects.add(param));
+    }
+    else if(command.equals("update")) {
+      int index = objects.indexOf(param);
+      objects.set(index, param);
+
+      result = new Boolean(true);
+    }
+    else if(command.equals("delete")) {
+      result = new Boolean(objects.remove(param));  
+    }
+    else if(command.equals("find")) {
+      int id = ((Integer)param).intValue();
+      
+      for(int i=0; i < objects.size() && result == null; i++) {
+        TransferObject to = (TransferObject)objects.get(i);
+
+        int currentId = ((Integer)to.getData("id")).intValue();
+
+        if(currentId == id) {
+          result = to;
+        }
+      }
+    }
+    else if(command.equals("getAll")) {
+      result = objects;
+    }
+
+    return result;
+  }
+}
+
+class MyTransferObjectDAO implements TransferObjectDAO {
+  private DataSource dataSource;
+
+  public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  public int create() {
+    TransferObject to = new MyTransferObject();
+
+    int id = dataSource.generateNextId();
+
+    to.setData("id", new Integer(id));
+
+    dataSource.executeCommand("insert", to);
+
+    return id;
+  }
+
+  public boolean update(TransferObject to) {
+    return ((Boolean)dataSource.executeCommand("update", to)).booleanValue();
+  }
+  
+  public boolean delete(TransferObject to) {
+    return ((Boolean)dataSource.executeCommand("delete", to)).booleanValue();
+  }
+
+  public TransferObject find(int id) {
+    return (TransferObject)dataSource.executeCommand("find", new Integer(id));
+  }
+
+  public List getAll() {
+    return (List)dataSource.executeCommand("getAll", null);
+  }
+}
+
+class MyTransferObjectDAOFactory implements TransferObjectDAOFactory {
+  private DataSource dataSource;
+
+  public MyTransferObjectDAOFactory(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
+
+  public TransferObjectDAO getTransferObjectDAO() {
+    TransferObjectDAO dao = new MyTransferObjectDAO();
+    
+    dao.setDataSource(dataSource);
+    
+    return dao;
+  }
+}
+
+
+// test - or business object, or client
+
+DataSource dataSource = new MyDataSource();
+
+TransferObjectDAOFactory factory = new MyTransferObjectDAOFactory(dataSource);
+
+TransferObjectDAO dao = factory.getTransferObjectDAO();
+
+// create a new domain object
+int newId = dao.create();
+
+// Find a domain object.
+TransferObject o1 = dao.find(newId);
+
+System.out.println("o1: " + o1);
+
+// modify the values in the Transfer Object.
+o1.setData("address", "a1");
+o1.setData("email", "em1");
+
+// update the domain object using the DAO
+dao.update(o1);
+
+System.out.println("o1: " + o1);
+
+List list = dao.getAll();
+
+System.out.println("list before delete: " + list);
+
+// delete a domain object
+dao.delete(o1);
+
+System.out.println("list after delete: " + list);

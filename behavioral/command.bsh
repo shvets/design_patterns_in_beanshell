@@ -1,0 +1,35 @@
+// command.bsh
+
+// Encapsulate a request as an object, thereby letting you parametrize
+// clients with different requests, queue or log requests, and support
+// undoable operations.
+
+interface Command {
+  void execute();
+}
+
+class MyCommand1 implements Command {
+  public void execute() {
+    System.out.println("command1");
+  }
+}
+
+class MyCommand2 implements Command {
+  public void execute() {
+    System.out.println("command2");
+  }
+}
+
+class MyCommand3 implements Command {
+  public void execute() {
+    System.out.println("command3");
+  }
+}
+
+// test
+
+Command[] commands = new Command[] { new MyCommand1(), new MyCommand2(), new MyCommand3(), new MyCommand2(), new MyCommand1() };
+
+for(int i=0; i < commands.length; i++) {
+  commands[i].execute();
+}

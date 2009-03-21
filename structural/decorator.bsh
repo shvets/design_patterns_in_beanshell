@@ -1,0 +1,72 @@
+// decorator.bsh
+
+// Attaches additional responsibilities to an object dynamically. Provides
+// a flexible alternative to subclassing for extending functionality.
+
+// 1. type interface
+
+interface Component {
+  void operation();
+}
+
+// 2. type implementation
+
+class ConcreteComponent implements Component {
+  public void operation() {
+    System.out.println("my component");
+  }
+}
+
+// 3. traditional solution based on inheritance
+
+class TraditionalComponent extends ConcreteComponent {
+  public void preDecoration() {
+    System.out.println("my component pre decoration");
+  }
+
+  public void postDecoration() {
+    System.out.println("my component post decoration");
+  }
+
+  public void operation() {
+    preDecoration();
+
+    super.operation();
+
+    postDecoration();
+  }
+}
+
+// 4. solution based on decorator
+
+class Decorator implements Component {
+  private Component component;
+
+  public Decorator(Component component) {
+    this.component = component;
+  }
+
+  public void preDecoration() {
+    System.out.println("my component pre decoration");
+  }
+
+  public void postDecoration() {
+    System.out.println("my component post decoration");
+  }                                   
+
+  public void operation() {
+    preDecoration();
+
+    component.operation();
+
+    postDecoration();
+  }
+}
+
+// 5. test
+
+Component component1 = new TraditionalComponent();
+Component component2 = new Decorator(new ConcreteComponent());
+
+component1.operation();
+component2.operation();

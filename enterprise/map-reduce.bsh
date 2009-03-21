@@ -1,0 +1,133 @@
+// map-reduce.bsh
+
+// http://www.theserverside.com/tt/knowledgecenter-tc/knowledgecenter-tc.tss?l=MapReduce
+// http://www.theserverside.com/tt/articles/article.tss?l=MapReduceRedux
+
+// MapReduce is a distributed programming model intended for processing massive amounts of data in large clusters, 
+// developed by Jeffrey Dean and Sanjay Ghemawat at Google. The implementation of MapReduce separates the business
+// logic from the multi-processing logic. 
+//
+// MapReduce is implemented as two functions, Map which applies a function to all the members of a collection and
+// returns a list of results based on that processing, and Reduce, which collates and resolves the results from 
+// two or more Maps executed in parallel by multiple threads, processors, or stand-alone systems. Both Map() 
+// and Reduce() may run in parallel, though not necessarily in the same system at the same time.
+
+// 1. functors interfaces
+
+interface MapFunctor {
+ 
+ Object function(Object o);
+
+}
+
+interface ReduceFunctor {
+ 
+ List function(List list, Object o);
+
+}
+
+// 2. map-reduce interface
+
+interface MapReduce {
+
+  List map(MapFunctor functor, List list);
+
+  List reduce(ReduceFunctor functor, List list, List init);
+
+}
+
+
+// 3. implementations
+
+class MapFunctorImpl implements MapFunctor {
+ 
+ public Object function(Object o) { // copier
+   return o;
+ }
+
+}
+
+class ReduceFunctorImpl implements ReduceFunctor {
+ 
+ public List function(List list, Object o) { // duplication reducer
+   if(!list.contains(o)) {
+     list.add(o);
+   }
+
+   return list;
+ }
+
+}
+
+class MapReduceImpl implements MapReduce {
+
+  public List map(MapFunctor functor, List list) {
+    List intermediateResult = new ArrayList();
+
+    for(int i=0; i < list.size(); i++) {
+      Object element = list.get(i);
+
+      Object result = functor.function(element);
+
+      intermediateResult.add(result);
+    }
+
+    return intermediateResult;
+  }
+
+  public List reduce(ReduceFunctor functor, List list, List init) {
+    List result = init;
+
+    for(int i=0; i < list.size(); i++) {
+      Object value = list.get(i);
+
+      result = functor.function(result, value);
+    }
+
+
+    return result;
+  }
+
+}
+
+// 4. test
+
+// input data
+
+List bucket1 = new ArrayList();
+bucket1.add("1");
+bucket1.add("2");
+bucket1.add("3");
+bucket1.add("4");
+bucket1.add("5");
+
+List bucket2 = new ArrayList();
+bucket2.add("6");
+bucket2.add("4");
+bucket2.add("8");
+bucket2.add("5");
+bucket2.add("10");
+
+// Business logic is concentrated in functors
+
+MapFunctor mapFunctor = new MapFunctorImpl();
+ReduceFunctor reduceFunctor = new ReduceFunctorImpl();
+
+// Different instances of map-reduce objects. They can be used for "map" or "reduce" operations.
+
+MapReduce mapReduce1 = new MapReduceImpl();
+MapReduce mapReduce2 = new MapReduceImpl();
+MapReduce mapReduce3 = new MapReduceImpl();
+
+List intermediateData1 = mapReduce1.map(mapFunctor, bucket1);
+List intermediateData2 = mapReduce2.map(mapFunctor, bucket2);
+
+List finalData = mapReduce3.reduce(reduceFunctor, intermediateData2, intermediateData1);
+
+System.out.println("bucket1: " + bucket1);
+System.out.println("bucket2: " + bucket2);
+
+System.out.println("intermediateData1: " + intermediateData1);
+System.out.println("intermediateData2: " + intermediateData2);
+
+System.out.println("finalData: " + finalData);

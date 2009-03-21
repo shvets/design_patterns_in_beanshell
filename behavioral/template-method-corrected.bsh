@@ -1,0 +1,104 @@
+// template-method-corrected.bsh
+
+// Use Strategy pattern instead.
+
+// Prefer composition to inheritance
+// - Allows greater reuse
+// - Communicates intent better
+// - Easier to understand
+// - Easier to maintain
+// - More robust as it evolves
+// Inheritance is a very strong form of coupling
+// - Especially in a single-inheritance language
+
+// 1. Strategy type and it's implementations
+
+interface Strategy {
+  void operation();
+}
+
+// strategy 1
+
+public class Step1Strategy1Impl implements Strategy {
+  public void operation() {
+    System.out.println("stategy1: step1");
+  }
+}
+
+public class Step2Strategy1Impl implements Strategy {
+  public void operation() {
+    System.out.println("stategy1: step2");
+  }
+}
+
+public class Step3Strategy1Impl implements Strategy {
+  public void operation() {
+    System.out.println("stategy1: step3");
+  }
+}
+
+// strategy 2
+
+public class Step1Strategy2Impl implements Strategy {
+  public void operation() {
+    System.out.println("stategy2: step1");
+  }
+}
+
+public class Step2Strategy2Impl implements Strategy {
+  public void operation() {
+    System.out.println("stategy2: step2");
+  }
+}
+
+public class Step3Strategy2Impl implements Strategy {
+  public void operation() {
+    System.out.println("stategy2: step3");
+  }
+}
+
+
+// 2. template algorithm; also acts as strategy context
+
+public class AlgorithmTemplate {
+  protected List steps = new ArrayList(); // strategies
+
+  // The "template method"
+  public void someTemplateMethod() {
+    for(int i=0; i < steps.size(); i++) {
+      Strategy step = (Strategy)steps.get(i);
+
+      step.operation();
+    }
+  }  
+}
+
+public class MyAlgorithmTemplate1 extends AlgorithmTemplate {  
+  public MyAlgorithmTemplate1() {
+    super();
+
+    steps.add(new Step1Strategy1Impl());
+    steps.add(new Step2Strategy1Impl());
+    steps.add(new Step3Strategy1Impl());
+  }
+}
+
+public class MyAlgorithmTemplate2 extends AlgorithmTemplate {  
+  public MyAlgorithmTemplate2() {
+    super();
+
+    steps.add(new Step1Strategy2Impl());
+    steps.add(new Step2Strategy2Impl());
+    steps.add(new Step3Strategy2Impl());
+  }
+}
+
+
+// test
+
+AlgorithmTemplate template1 = new MyAlgorithmTemplate1();
+AlgorithmTemplate template2 = new MyAlgorithmTemplate2();
+
+template1.someTemplateMethod();
+template2.someTemplateMethod();
+

@@ -1,0 +1,290 @@
+// mvc.bsh
+
+// 1. observer and observable interfaces (see Observer pattern)
+
+interface Observer {
+  void update(String key, Object value);
+}
+
+interface Observable { // see Observer pattern
+  void addObserver(Observer observer);
+  
+  void removeObserver(Observer observer);
+
+  void notifyObservers(String key, Object value);
+}
+
+// 2. Model, Controller-Mediator-Observer, View
+
+interface Model {
+  Object getValue(String key);
+
+  void setData(String key, Object value);
+
+  Observable getObservable();
+}
+
+interface Controller implements Observer {
+  // Binds a model to this controller. Once added, the controller will listen for all 
+  // model property changes and propagate them on to registered views. In addition,
+  // it is also responsible for resetting the model properties when a view changes state.
+  void addModel(Model model);
+
+  void removeModel(Model model);
+  
+  // Binds a view to this controller. The controller will propogate all model property
+  // changes to each view for consideration.
+  void addView(View view);
+  
+  void removeView(View view);
+
+  List getModels();
+
+  List getViews();
+
+  void operation1(Object value);
+  void operation2(Object value);
+}
+
+interface View implements Observer {
+  void setController(Controller controller);
+}
+
+// 3. Implementation of observable
+
+class AbstractObservable implements Observable {
+  private List observers = new ArrayList();
+
+  public void addObserver(Observer observer) {
+    observers.add(observer);
+  }
+  
+  public void removeObserver(Observer observer) {
+    observers.remove(observer);
+  }
+
+  public void notifyObservers(String key, Object value) {
+    List snapshot = observers.clone();
+
+    for(int i=0; i < snapshot.size(); i++) {
+      Observer observer = (Observer)snapshot.get(i);
+
+      observer.update(key, value);
+    }
+  }
+}
+
+// 4. implementations
+
+class MyModel implements Model {
+  private Observable observable = new AbstractObservable();
+
+  public Observable getObservable() {
+    return observable;
+  }
+
+  // model implementation
+
+  private Map data = new HashMap();
+
+  public Object getValue(String key) {
+    return data.get(key);
+  }
+
+  public void setData(String key, Object value) { // mutator
+    data.put(key, value);
+
+    observable.notifyObservers(key, value); // notify about state change
+  }
+
+  public String toString() {
+    return "model: " + data;
+  }
+}
+
+// this controller mediates all changes in model and propagates them to
+// all registered views through update() method
+class AbstractController implements Controller {
+  // controller behavior
+
+  private List models = new ArrayList();
+  private List views = new ArrayList();
+
+  public void addModel(Model model) {
+    models.add(model);
+
+    model.getObservable().addObserver(this);
+  }
+
+  public void removeModel(Model model) {
+    models.remove(model);
+
+    model.getObservable().removeObserver(this);
+  }
+
+  public void addView(View view) {
+    views.add(view);
+
+    view.setController(this);
+  }
+
+  public void removeView(View view) {
+    views.remove(view);
+  }
+
+  public List getModels() {
+    return models;
+  }
+
+  public List getViews() {
+    return views;
+  }
+
+  // observer behavior
+
+  // This method represents changes model -> views
+
+  // Use this to observe property changes from registered models
+  // and propagate them on to all registered views.
+  public void update(String key, Object value) {
+    for (int i=0; i < views.size(); i++) {
+      View view = (View)views.get(i);
+      
+      view.update(key, value);
+    }
+  }
+
+  // This method represents changes view -> models
+
+  // Convienence method that subclasses can call upon to fire off property changes
+  // back to the models. This method used reflection to inspect each of the model
+  // classes to determine if it is the owner of the property in question. If it
+  // isn't, a NoSuchMethodException is throws (which the method ignores).
+  protected void setModelProperty(String key, Object value) {
+    for(int i=0; i < models.size(); i++) {
+      Model model = (Model)models.get(i);
+
+      model.setData(key, value);
+    }
+  }
+}
+
+class MyView implements View {
+  private Controller controller;
+
+  private String property1;
+  private String property2;
+
+  public void setController(Controller controller) {
+    this.controller = controller;
+  }
+                                    
+  public void setProperty1(String value) {
+    this.property1 = value;
+
+    controller.operation1(value);
+  }
+
+  public void setProperty2(String value) {
+    this.property2 = value;
+
+    controller.operation2(value);
+  }
+
+  public void update(String key, Object value) {
+    if(key.equals("property1")) {
+      property1 = (String)value;
+    }
+
+    if(key.equals("property2")) {
+      property2 = (String)value;
+    }
+  }
+
+  public String toString() {
+    return "view[property1: " + property1 + "; property2: " + property2 + "]";
+  }
+}
+
+class MyController extends AbstractController {
+  // implementing Mediator
+
+  public void operation1(Object value) {
+    setModelProperty("property1", value);
+  }
+
+  public void operation2(Object value) {
+    setModelProperty("property2", value);
+  }
+}
+
+// 5. test
+
+printController(Controller controller) {
+  List models = controller.getModels();
+
+  for(int i=0; i < models.size(); i++) {
+    Model model = (Model)models.get(i);
+
+    System.out.println("model" + (i+1) + ": " + model);
+  }
+
+  List views = controller.getViews();
+
+  for (int i=0; i < views.size(); i++) {
+    View view = (View)views.get(i);
+
+    System.out.println("view" + (i+1) + ": " + view);
+  }
+}
+
+Controller controller1 = new MyController();
+
+Model model1 = new MyModel();
+
+View view11 = new MyView();
+View view12 = new MyView();
+
+controller1.addModel(model1);
+controller1.addView(view11);
+controller1.addView(view12);
+
+Controller controller2 = new MyController();
+
+Model model2 = new MyModel();
+Model model3 = new MyModel();
+
+View view21 = new MyView();
+View view22 = new MyView();
+View view23 = new MyView();
+
+controller2.addModel(model2);
+controller2.addModel(model3);
+controller2.addView(view21);
+controller2.addView(view22);
+controller2.addView(view23);
+
+System.out.println("1. changes in model1");
+
+model1.setData("property1", "555");
+
+printController(controller1);
+
+System.out.println("2. changes in view12");
+
+view12.setProperty2("777");
+
+printController(controller1);
+
+System.out.println("3. changes in model3");
+
+model3.setData("property1", "111");
+
+printController(controller2);
+
+System.out.println("4. changes in view23");
+
+view23.setProperty1("222");
+view23.setProperty2("333");
+
+printController(controller2);

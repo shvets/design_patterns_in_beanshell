@@ -1,0 +1,81 @@
+// observer.bsh
+
+// Define a one-to-many dependency between objects so that when one object
+// changes state, all it's dependents are notified and updated automatically.
+
+// 1. observer interface
+
+interface Observer {
+  void update();
+}
+
+// 2. observer implementation
+
+class MyObserver implements Observer {
+  String name;
+
+  public MyObserver(String name) {
+    this.name = name;
+  }
+
+  public void update() {
+    System.out.println("updated " + name);
+  }
+}
+
+// 3. Observable, serves as a container for observers and takes care of notifying them
+
+interface Observable { // or subject
+  void addObserver(Observer observer);
+  
+  void removeObserver(Observer observer);
+
+  void notifyObservers();
+}
+
+// 4. Implementation of observable
+
+class DefaultObservable implements Observable {
+  private List observers = new ArrayList();
+
+  public void addObserver(Observer observer) {
+    observers.add(observer);
+  }
+  
+  public void removeObserver(Observer observer) {
+    observers.remove(observer);
+  }
+
+  public void notifyObservers() {
+    List snapshot = observers.clone();
+
+    for(int i=0; i < snapshot.size(); i++) {
+      Observer observer = (Observer)snapshot.get(i);
+
+      observer.update();
+    }
+  }
+}
+
+// 5. test
+
+class Tester extends DefaultObservable {
+}
+
+Observer observer1 = new MyObserver("n1");
+Observer observer2 = new MyObserver("n2");
+Observer observer3 = new MyObserver("n3");
+
+Observable tester = new Tester();
+
+tester.addObserver(observer1);
+tester.addObserver(observer2);
+tester.addObserver(observer3);
+
+tester.notifyObservers();
+
+System.out.println("----------");
+
+tester.removeObserver(observer3);
+
+tester.notifyObservers();

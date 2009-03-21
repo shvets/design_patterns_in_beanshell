@@ -1,0 +1,46 @@
+// iterator.bsh
+
+// Provides a way to access the elements of an aggregate object sequentially without exposing 
+// its underlying representation.
+
+interface Iterator {
+  Object next();
+
+  boolean hasNext();
+}
+
+class MyProduct {
+  private List elements = new ArrayList();
+
+  public MyProduct() {
+    elements.add("e1");
+    elements.add("e2");
+    elements.add("e3");
+    elements.add("e4");
+  }
+
+  public Iterator iterator() {
+    return new Iterator() {
+      private int index = 0;
+
+      public Object next() {
+        return elements.get(index++);
+      }
+
+      public boolean hasNext() {
+        return index < elements.size();
+      }
+    };
+  }
+}
+
+// test
+
+MyProduct product = new MyProduct();
+
+Iterator iterator = product.iterator();
+
+while(iterator.hasNext()) {
+  System.out.println(iterator.next());
+} 
+

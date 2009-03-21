@@ -1,0 +1,34 @@
+// prototype.bsh
+
+// Specify the kind of objects to create using prototypical instance,
+// and create new objects by copying this prototype.
+
+interface Prototype {
+  Object makePrototype();
+}
+
+class Product implements Prototype {
+  protected String name = "name";
+
+  public Object makePrototype() {
+    Product clonedProduct = new Product();
+    
+    clonedProduct.name = name;
+
+    return clonedProduct;
+  }
+
+  public String toString() {
+    return super.toString() + ", name: " + name;
+  }
+}
+
+// test
+
+Product originalProduct = new Product();
+
+Product clonedProduct = originalProduct.makePrototype();
+
+System.out.println("originalProduct: " + originalProduct);
+System.out.println("clonedProduct : " + clonedProduct);
+

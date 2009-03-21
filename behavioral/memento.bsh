@@ -1,0 +1,82 @@
+// memento.bsh
+
+// Without violating encapsulation, capture and externalize an object's internal state
+// so that the object can be restored to this state later.
+
+// 1. This class don't want to reveal it's internal state and delegates presistance work to memento
+//    object. This object should have access to private properties of enclosed class.
+
+class Originator {
+  private String state;
+
+  class Memento {
+    private Object mementoState;
+
+    public Memento(Object state) {
+      this.mementoState = state;
+    }
+
+    public void restoreMemento() {
+      state = this.mementoState;
+    }
+  }
+        
+  public void setState(String state) { 
+    this.state = state; 
+  }
+
+  public void printState() {
+    System.out.println(state);
+  }
+
+  public Object createMemento() { 
+    return new Memento(state); 
+  }
+  
+  public void restoreMemento(Object m) {
+    if (m instanceof Memento) {
+      ((Memento)m).restoreMemento(); 
+    }
+  }
+}
+
+// 2. Caretaker holds previously creted mementos: storage 
+
+class Caretaker {
+  private List savedStates = new ArrayList();
+
+  public void addMemento(Object memento) {
+    savedStates.add(memento);
+  }
+ 
+  public Object getMemento(int index) {
+    return savedStates.get(index);
+  }
+}
+
+// 3. test
+
+Caretaker caretaker = new Caretaker();
+
+Originator originator = new Originator();
+
+originator.setState("State1");
+System.out.print("step1: "); originator.printState();
+
+originator.setState("State2");
+System.out.print("step2: "); originator.printState();
+
+caretaker.addMemento( originator.createMemento() );
+System.out.print("step3: "); originator.printState();
+
+originator.setState("State3");
+System.out.print("step4: "); originator.printState();
+
+caretaker.addMemento( originator.createMemento() );
+System.out.print("step5: "); originator.printState();
+
+originator.setState("State4");
+System.out.print("step6: "); originator.printState();
+
+originator.restoreMemento( caretaker.getMemento(1) );
+System.out.print("step7: "); originator.printState();
